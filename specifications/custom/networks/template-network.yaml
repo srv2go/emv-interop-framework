@@ -1,0 +1,30 @@
+
+network: DISCOVER
+version: "3.0"
+specifications:
+  kernelId: C6
+  c8Fallback: true
+  fallbackPath:
+    - C8
+    - C6
+
+fieldDefinitions:
+  track2Separator: "D"
+  panMaxLength: 19
+  iadFormat:
+    length: 32
+    derivationKeyIndex:
+      offset: 0
+      length: 2
+    cryptogramVersion:
+      offset: 2
+      length: 1
+
+specificTags:
+  DPAS_CTQ: "DF8117"
+  FFI: "9F6E"
+
+transactionRules:
+  cvmThreshold: 5000
+  contactlessLimit: 20000
+  allowNoCVM: true

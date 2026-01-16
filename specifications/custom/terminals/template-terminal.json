@@ -1,0 +1,29 @@
+{
+  "vendor": "CUSTOM_VENDOR",
+  "name": "Custom Vendor",
+  "models": {
+    "CustomModel-1000": {
+      "kernelSupport": [
+        "C2",
+        "C3",
+        "C6"
+      ],
+      "firmwareVersions": [
+        "1.0",
+        "1.1"
+      ],
+      "c8Support": false,
+      "contactless": true,
+      "contact": true,
+      "capabilities": {
+        "terminalType": "ATTENDED_ONLINE",
+        "terminalCapabilities": "E0F8C8",
+        "cvmSupport": [
+          "SIGNATURE",
+          "ONLINE_PIN",
+          "NO_CVM"
+        ]
+      }
+    }
+  }
+}

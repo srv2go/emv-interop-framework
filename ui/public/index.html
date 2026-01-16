@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMV Interop Testing Framework - Discover D-PAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .test-scenario {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .test-scenario:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+
+        .test-scenario h4 {
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .test-scenario p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .test-scenario .meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-passed {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+        }
+
+        .result-failed {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+        }
+
+        .result-warning {
+            border-left: 4px solid #ffc107;
+            background: #fff3cd;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .spinner.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: #1976D2;
+            margin-bottom: 8px;
+        }
+
+        .spec-directory {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            overflow-x: auto;
+        }
+
+        .matrix-cell {
+            text-align: center;
+        }
+
+        .matrix-cell.pass {
+            background: #d4edda;
+        }
+
+        .matrix-cell.fail {
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 EMV Interoperability Testing Framework</h1>
+            <p>Discover D-PAS Testing Suite - C6 & C8 Compatibility</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('tests')">🧪 Run Tests</button>
+            <button class="tab" onclick="switchTab('specifications')">📋 Specifications</button>
+            <button class="tab" onclick="switchTab('custom')">⚙️ Custom Specs</button>
+            <button class="tab" onclick="switchTab('help')">❓ Help</button>
+        </div>
+
+        <div id="tests" class="tab-content active">
+            <div class="card">
+                <h3>Available Test Scenarios</h3>
+                <div id="scenario-list"></div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="runAllTests()">▶️ Run All Tests</button>
+                </div>
+            </div>
+
+            <div id="test-results" class="card" style="display: none;">
+                <h3>Test Results</h3>
+                <div class="spinner" id="spinner"></div>
+                <div id="results-content"></div>
+            </div>
+        </div>
+
+        <div id="specifications" class="tab-content">
+            <div class="card">
+                <h3>Card Specifications</h3>
+                <div id="card-specs-content"></div>
+            </div>
+
+            <div class="card">
+                <h3>Terminal Vendors</h3>
+                <div id="terminal-vendors-content"></div>
+            </div>
+        </div>
+
+        <div id="custom" class="tab-content">
+            <div class="card">
+                <h3>Custom Specifications</h3>
+                <div class="info-box">
+                    <h4>📁 Custom Specification Directory</h4>
+                    <p>Place your custom JSON/YAML specification files in the following directory:</p>
+                    <div id="spec-directory" class="spec-directory">Loading...</div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h4>Directory Structure:</h4>
+                        <pre>custom/
+├── applets/       (Card applet specs)
+├── terminals/     (Terminal profiles)
+└── networks/      (Network configs)</pre>
+                    </div>
+                    <div>
+                        <h4>Supported Formats:</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>JSON (.json)</li>
+                            <li>YAML (.yaml, .yml)</li>
+                        </ul>
+                        <p style="margin-top: 10px;">Template files are automatically created in the custom directory.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="reloadCustomSpecs()">🔄 Reload Custom Specifications</button>
+                </div>
+
+                <div id="custom-specs-status" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div id="help" class="tab-content">
+            <div class="card">
+                <h3>Getting Started</h3>
+                
+                <div class="info-box">
+                    <h4>🎯 Purpose</h4>
+                    <p>This framework helps you test Discover card specifications against various terminal types to ensure backward compatibility and interoperability.</p>
+                </div>
+
+                <h4 style="margin-top: 20px;">Quick Start Guide:</h4>
+                <ol style="margin-left: 30px; line-height: 2;">
+                    <li><strong>Run Tests:</strong> Go to the "Run Tests" tab and click on any test scenario to execute it</li>
+                    <li><strong>View Results:</strong> Test results will show compatibility, warnings, and recommendations</li>
+                    <li><strong>Custom Specs:</strong> Add your own card/terminal specifications in the Custom Specs tab</li>
+                    <li><strong>Compatibility Matrix:</strong> Run the cross-vendor test to see full compatibility</li>
+                </ol>
+
+                <h4 style="margin-top: 30px;">Test Scenarios Explained:</h4>
+                <table>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>What It Tests</th>
+                    </tr>
+                    <tr>
+                        <td>D-PAS 1.0 on Legacy C6</td>
+                        <td>Legacy card on old terminals (e.g., Verifone VX520)</td>
+                    </tr>
+                    <tr>
+                        <td>D-PAS 2.1 on Modern C6</td>
+                        <td>Current production cards with CDCVM support</td>
+                    </tr>
+                    <tr>
+                        <td>D-PAS 3.0 C8→C6 Fallback</td>
+                        <td>C8-ready cards falling back to C6 on legacy terminals</td>
+                    </tr>
+                    <tr>
+                        <td>D-PAS 3.0 on C8 Terminal</td>
+                        <td>C8-ready cards on C8-capable terminals</td>
+                    </tr>
+                    <tr>
+                        <td>Discover C8 Full</td>
+                        <td>Full C8 implementation end-to-end</td>
+                    </tr>
+                    <tr>
+                        <td>Cross-Vendor Matrix</td>
+                        <td>All combinations of cards and terminals</td>
+                    </tr>
+                </table>
+
+                <h4 style="margin-top: 30px;">Adding Custom Applets:</h4>
+                <p>To test your own Discover applet specification:</p>
+                <ol style="margin-left: 30px; line-height: 1.8; margin-top: 10px;">
+                    <li>Navigate to the custom specifications directory (shown in Custom Specs tab)</li>
+                    <li>Open the <code>applets/template-discover-applet.json</code> file</li>
+                    <li>Modify the values to match your applet specification</li>
+                    <li>Save with a new filename (e.g., <code>my-dpas-applet.json</code>)</li>
+                    <li>Click "Reload Custom Specifications" in the Custom Specs tab</li>
+                    <li>Your applet will now be available for testing</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTest = null;
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'specifications') {
+                loadSpecifications();
+            } else if (tabName === 'tests') {
+                loadTestScenarios();
+            } else if (tabName === 'custom') {
+                loadCustomDirectory();
+            }
+        }
+
+        // Load test scenarios
+        async function loadTestScenarios() {
+            try {
+                const response = await fetch('/api/test-scenarios');
+                const data = await response.json();
+                
+                const list = document.getElementById('scenario-list');
+                list.innerHTML = data.data.map(scenario => `
+                    <div class="test-scenario" onclick="runTest('${scenario.id}')">
+                        <h4>${scenario.name}</h4>
+                        <p>${scenario.description}</p>
+                        <div class="meta">
+                            <span><strong>Card:</strong> ${scenario.cardVersion}</span>
+                            <span><strong>Terminal Kernel:</strong> ${scenario.terminalKernel}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading scenarios:', error);
+            }
+        }
+
+        // Run a single test
+        async function runTest(scenarioId) {
+            const resultsDiv = document.getElementById('test-results');
+            const spinner = document.getElementById('spinner');
+            const resultsContent = document.getElementById('results-content');
+
+            resultsDiv.style.display = 'block';
+            spinner.classList.add('show');
+            resultsContent.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/test/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scenarioId })
+                });
+
+                const data = await response.json();
+                displayResults(data.data);
+            } catch (error) {
+                resultsContent.innerHTML = `<div class="result-container result-failed show">
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                </div>`;
+            } finally {
+                spinner.classList.remove('show');
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('test-results');
+            const spinner = document.getElementById('spinner');
+            const resultsContent = document.getElementById('results-content');
+
+            resultsDiv.style.display = 'block';
+            spinner.classList.add('show');
+            resultsContent.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/test/run-all', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                displayAllResults(data.data);
+            } catch (error) {
+                resultsContent.innerHTML = `<div class="result-container result-failed show">
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                </div>`;
+            } finally {
+                spinner.classList.remove('show');
+            }
+        }
+
+        // Display single test results
+        function displayResults(result) {
+            const resultsContent = document.getElementById('results-content');
+            
+            // Handle matrix results differently
+            if (result.matrix) {
+                displayMatrixResults(result);
+                return;
+            }
+            
+            const statusClass = result.passed ? 'result-passed' : 'result-failed';
+            const statusIcon = result.passed ? '✅' : '❌';
+
+            let html = `
+                <div class="result-container ${statusClass} show">
+                    <h4>${statusIcon} ${result.scenario}</h4>
+                    <p><strong>Status:</strong> ${result.passed ? 'PASSED' : 'FAILED'}</p>
+            `;
+
+            if (result.details) {
+                html += `<h5 style="margin-top: 15px;">Details:</h5>
+                         <pre>${JSON.stringify(result.details, null, 2)}</pre>`;
+            }
+
+            if (result.warnings && result.warnings.length > 0) {
+                html += `<h5 style="margin-top: 15px;">Warnings:</h5><ul>`;
+                result.warnings.forEach(w => html += `<li>${w}</li>`);
+                html += `</ul>`;
+            }
+
+            html += `</div>`;
+            resultsContent.innerHTML = html;
+        }
+        
+        // Display matrix test results
+        function displayMatrixResults(result) {
+            const resultsContent = document.getElementById('results-content');
+            
+            let html = `
+                <div class="result-container show">
+                    <h4>🔍 ${result.scenario}</h4>
+                    <p><strong>Total Tests:</strong> ${result.summary.passed + result.summary.failed}</p>
+                    <p><strong>Passed:</strong> <span class="badge badge-success">${result.summary.passed}</span></p>
+                    <p><strong>Failed:</strong> <span class="badge badge-danger">${result.summary.failed}</span></p>
+                </div>
+                <div class="result-container show">
+                    <h4>Compatibility Matrix</h4>
+                    <div class="matrix-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Card Version</th>
+                                    ${Object.keys(Object.values(result.matrix)[0] || {}).map(t => `<th>${t}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.keys(result.matrix).map(card => `
+                                    <tr>
+                                        <td><strong>${card}</strong></td>
+                                        ${Object.values(result.matrix[card]).map(r => `
+                                            <td class="matrix-cell ${r.passed ? 'pass' : 'fail'}">
+                                                ${r.passed ? '✅' : '❌'}
+                                                <br><small>Kernel: ${r.kernel || 'N/A'}</small>
+                                            </td>
+                                        `).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = html;
+        }
+
+        // Display all test results
+        function displayAllResults(results) {
+            const resultsContent = document.getElementById('results-content');
+            
+            let html = `
+                <div class="result-container show">
+                    <h4>📊 Test Suite Summary</h4>
+                    <p><strong>Total Tests:</strong> ${results.totalTests}</p>
+                    <p><strong>Passed:</strong> <span class="badge badge-success">${results.passed}</span></p>
+                    <p><strong>Failed:</strong> <span class="badge badge-danger">${results.failed}</span></p>
+                    <p><strong>Timestamp:</strong> ${new Date(results.timestamp).toLocaleString()}</p>
+                </div>
+            `;
+
+            results.results.forEach(result => {
+                if (result.matrix) {
+                    // Compatibility matrix
+                    html += `<div class="result-container show">
+                        <h4>🔍 Cross-Vendor Compatibility Matrix</h4>
+                        <div class="matrix-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Card Version</th>
+                                        ${Object.keys(Object.values(result.matrix)[0] || {}).map(t => `<th>${t}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.keys(result.matrix).map(card => `
+                                        <tr>
+                                            <td><strong>${card}</strong></td>
+                                            ${Object.values(result.matrix[card]).map(r => `
+                                                <td class="matrix-cell ${r.passed ? 'pass' : 'fail'}">
+                                                    ${r.passed ? '✅' : '❌'}
+                                                    <br><small>${r.kernel || ''}</small>
+                                                </td>
+                                            `).join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                } else {
+                    const statusClass = result.passed ? 'result-passed' : 'result-failed';
+                    const statusIcon = result.passed ? '✅' : '❌';
+                    html += `<div class="result-container ${statusClass} show">
+                        <h5>${statusIcon} ${result.scenario}</h5>
+                    </div>`;
+                }
+            });
+
+            resultsContent.innerHTML = html;
+        }
+
+        // Load specifications
+        async function loadSpecifications() {
+            try {
+                const [cardsRes, vendorsRes] = await Promise.all([
+                    fetch('/api/card-versions'),
+                    fetch('/api/terminal-vendors')
+                ]);
+
+                const cards = await cardsRes.json();
+                const vendors = await vendorsRes.json();
+
+                // Display card specs
+                const cardsDiv = document.getElementById('card-specs-content');
+                cardsDiv.innerHTML = `
+                    <table>
+                        <tr>
+                            <th>Version</th>
+                            <th>Network</th>
+                            <th>Kernel</th>
+                            <th>Features</th>
+                        </tr>
+                        ${cards.data.map(card => `
+                            <tr>
+                                <td><strong>${card.name}</strong></td>
+                                <td>${card.network}</td>
+                                <td><span class="badge badge-info">${card.kernel}</span></td>
+                                <td>${card.features.join(', ')}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+
+                // Display terminal vendors
+                const vendorsDiv = document.getElementById('terminal-vendors-content');
+                vendorsDiv.innerHTML = vendors.data.map(vendor => `
+                    <h4>${vendor.name}</h4>
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <th>Model</th>
+                            <th>Kernel Support</th>
+                            <th>C8 Support</th>
+                            <th>Contactless</th>
+                        </tr>
+                        ${vendor.models.map(model => `
+                            <tr>
+                                <td><strong>${model.name}</strong></td>
+                                <td>${model.kernelSupport.join(', ')}</td>
+                                <td>${model.c8Support ? '✅' : '❌'}</td>
+                                <td>${model.contactless ? '✅' : '❌'}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading specifications:', error);
+            }
+        }
+
+        // Load custom directory path
+        async function loadCustomDirectory() {
+            try {
+                const response = await fetch('/api/specifications/custom-directory');
+                const data = await response.json();
+                
+                document.getElementById('spec-directory').textContent = data.data.directory;
+            } catch (error) {
+                console.error('Error loading directory:', error);
+            }
+        }
+
+        // Reload custom specifications
+        async function reloadCustomSpecs() {
+            const statusDiv = document.getElementById('custom-specs-status');
+            statusDiv.innerHTML = '<div class="spinner show"></div>';
+
+            try {
+                const response = await fetch('/api/specifications/reload', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                statusDiv.innerHTML = `
+                    <div class="result-container result-passed show">
+                        <h4>✅ Specifications Reloaded</h4>
+                        <p><strong>Applets:</strong> ${data.data.applets.length}</p>
+                        <p><strong>Terminals:</strong> ${data.data.terminals.length}</p>
+                        <p><strong>Networks:</strong> ${data.data.networks.length}</p>
+                        ${data.data.errors.length > 0 ? `
+                            <h5>Errors:</h5>
+                            <ul>${data.data.errors.map(e => `<li>${e.file}: ${e.error}</li>`).join('')}</ul>
+                        ` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="result-container result-failed show">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            loadTestScenarios();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "name": "emv-interop-framework",
+  "version": "1.0.0",
+  "description": "EMV Payment Interoperability Testing Framework - Test card, terminal, and mobile HCE specifications across kernels (C2-C8)",
+  "main": "index.js",
+  "bin": {
+    "emv-interop": "./tools/cli.js"
+  },
+  "scripts": {
+    "start": "node quick-start.js",
+    "test": "node tests/run-all-tests.js",
+    "test:suite": "node tools/cli.js run-suite",
+    "test:scenario": "node tools/cli.js run-scenario",
+    "test:matrix": "node tools/cli.js matrix",
+    "test:interop": "node tools/cli.js run-suite fullInterop --report --report-format html",
+    "test:discover": "node tests/run-discover-tests.js",
+    "interactive": "node tools/cli.js interactive",
+    "ui": "node ui/server.js",
+    "example": "node tests/examples/basic-interop-test.js",
+    "lint": "eslint .",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "keywords": [
+    "emv",
+    "payment",
+    "contactless",
+    "nfc",
+    "terminal",
+    "card",
+    "hce",
+    "mobile",
+    "interoperability",
+    "testing",
+    "kernel",
+    "visa",
+    "mastercard",
+    "amex",
+    "c8"
+  ],
+  "author": "EMV Interop Team",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "js-yaml": "^4.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "jsdoc": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/emv-interop-framework.git"
+  },
+  "files": [
+    "core/",
+    "emulators/",
+    "specifications/",
+    "tools/",
+    "config/",
+    "index.js",
+    "README.md"
+  ]
+}

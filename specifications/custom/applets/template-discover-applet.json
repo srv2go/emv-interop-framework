@@ -1,0 +1,48 @@
+{
+  "name": "Custom Discover Applet",
+  "network": "DISCOVER",
+  "version": "1.0.0",
+  "aid": "A0000001523010",
+  "kernelSupport": [
+    "C6"
+  ],
+  "specifications": {
+    "specVersion": "CUSTOM_DPAS_1.0",
+    "releaseDate": "2025-01-01",
+    "features": [
+      "Custom feature 1",
+      "Custom feature 2"
+    ]
+  },
+  "staticData": {
+    "50": {
+      "tag": "50",
+      "description": "Application Label",
+      "value": "DISCOVER"
+    },
+    "9F09": {
+      "tag": "9F09",
+      "description": "Application Version",
+      "value": "0010"
+    },
+    "9F12": {
+      "tag": "9F12",
+      "description": "Application Preferred Name",
+      "value": "DISCOVER"
+    }
+  },
+  "cvmList": [
+    {
+      "method": "NO_CVM",
+      "condition": "ALWAYS"
+    },
+    {
+      "method": "SIGNATURE",
+      "condition": "IF_TERMINAL_SUPPORTS"
+    }
+  ],
+  "transactionLimits": {
+    "cvm": 5000,
+    "contactless": 20000
+  }
+}

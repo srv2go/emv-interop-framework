@@ -1,0 +1,130 @@
+# EMV Interoperability Testing Framework Configuration
+# Default configuration file
+
+framework:
+  name: "EMV Interop Testing Framework"
+  version: "1.0.0"
+
+# Test execution settings
+execution:
+  parallel: false
+  stopOnFailure: false
+  verbose: true
+  timeout: 30000  # ms
+
+# Report settings
+reports:
+  enabled: true
+  formats:
+    - json
+    - html
+    - markdown
+  outputDir: "./reports"
+  includeTimestamp: true
+
+# Default transaction parameters
+transaction:
+  amount: 1000  # $10.00 in cents
+  currencyCode: "0840"  # USD
+  transactionType: 0x00  # Goods/Services
+
+# Terminal configuration defaults
+terminal:
+  defaultType: "modern"
+  capabilities:
+    contactlessEnabled: true
+    contactlessLimit: 25000  # $250.00
+    cvmLimit: 5000  # $50.00
+    floorLimit: 0
+  
+  # Supported kernels for modern terminal
+  supportedKernels:
+    - C2  # Mastercard
+    - C3  # Visa
+    - C4  # Amex
+    - C5  # JCB
+    - C6  # Discover
+    - C7  # UnionPay
+    - C8  # Common kernel
+
+# Card configuration defaults
+card:
+  defaultNetwork: "Discover"
+  defaultSpecVersion: "DISCOVER_DPAS_2.1"
+
+# Mobile HCE configuration
+mobile:
+  defaultPlatform: "iOS"
+  defaultSDKVersion: "IOS_PassKit_3.0"
+  tokenServiceProviders:
+    - VISA_VTS
+    - MC_MDES
+
+# Interoperability testing settings
+interop:
+  detectIssues: true
+  strictValidation: false
+  
+  # Issue severity thresholds for test pass/fail
+  thresholds:
+    maxCriticalIssues: 0
+    maxErrorIssues: 0
+    maxWarningIssues: 5
+    maxInfoIssues: 999
+
+# Kernel-specific configurations
+kernels:
+  C2:
+    name: "Mastercard M/Chip"
+    version: "3.1"
+    enabled: true
+    
+  C3:
+    name: "Visa payWave"
+    version: "2.10"
+    enabled: true
+    
+  C4:
+    name: "Amex ExpressPay"
+    version: "1.0"
+    enabled: true
+    
+  C5:
+    name: "JCB J/Speedy"
+    version: "2.0"
+    enabled: true
+    
+  C6:
+    name: "Discover D-PAS"
+    version: "2.1"
+    enabled: true
+    
+  C7:
+    name: "UnionPay QuickPass"
+    version: "1.0"
+    enabled: true
+    
+  C8:
+    name: "Common Kernel"
+    version: "1.0"
+    enabled: true
+    fallbackEnabled: true
+
+# Logging configuration
+logging:
+  level: "info"  # debug, info, warn, error
+  console: true
+  file: false
+  filePath: "./logs/emv-interop.log"
+
+# Custom test scenarios (can be extended)
+customScenarios: []
+
+# Feature flags
+features:
+  # Enable/disable specific test categories
+  kernelFallbackTests: true
+  fieldValidationTests: true
+  mobileInteropTests: true
+  tapToPhoneTests: true
+  legacyTerminalTests: true
