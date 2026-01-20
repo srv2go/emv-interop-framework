@@ -8,10 +8,10 @@ A comprehensive testing framework designed to validate interoperability between 
 
 The payment ecosystem faces significant challenges when new specifications are introduced:
 
-1. **Kernel Version Fragmentation**: New kernels (e.g., C8) must coexist with legacy kernels (C2, C6)
+1. **Kernel Version Fragmentation**: New kernels (e.g., C8) must coexist with legacy kernels (C6) DPAS 1.0 ecosystem
 2. **Specification Drift**: Different networks implement specifications with subtle variations
 3. **Field Validation Inconsistencies**: Legacy terminals may enforce scheme-specific field validations
-4. **Fallback Behavior**: C8 → C6 → C2 fallback paths need validation
+4. **Fallback Behavior**: C8 → C6 → Legacy fallback paths need validation
 5. **Cross-Network Compatibility**: Visa, Mastercard, Amex, Discover specifications differ
 
 ## Architecture
